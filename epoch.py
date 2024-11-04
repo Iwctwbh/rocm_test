@@ -3,11 +3,13 @@ import torchvision.transforms as transforms
 from torchvision import datasets
 from torch.utils.data import DataLoader
 
-# 检查ROCm是否可用，如果不可用则使用CPU
-if torch.cuda.is_available() and torch.version.hip is not None:
+# 检查CUDA/ROCm是否可用，如果不可用则使用CPU
+if torch.cuda.is_available():
+    device = torch.device('cuda')
+elif torch.version.hip is not None:
     device = torch.device('rocm')
 else:
-    print("ROCm is not available. Defaulting to CPU.")
+    print("Neither CUDA nor ROCm is available. Defaulting to CPU.")
     device = torch.device('cpu')
 
 # 数据预处理
@@ -49,7 +51,7 @@ criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.001)
 
 # 训练模型
-for epoch in range(15):  # 训练 5 个 epoch
+for epoch in range(30):  # 训练 5 个 epoch
     for images, labels in train_loader:
         optimizer.zero_grad()
         outputs = model(images)
